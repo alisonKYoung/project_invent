@@ -1,33 +1,41 @@
+let port; // Declare port at the top level so it persists
+
 const connectButton = document.getElementById('connectButton');
 const output = document.getElementById('kekw');
 
 connectButton.addEventListener('click', async () => {
     try {
-        // Prompt user to select a serial port
-        const port = await navigator.serial.requestPort();
-        // Open the port with the same baud rate as the Arduino sketch
-        await port.open({ baudRate: 9600 });
+        // Only request a new port if we don't have one
+        if (!port) {
+            port = await navigator.serial.requestPort();
+        }
+        
+        // Only open if not already open
+        if (!port.opened) {
+            await port.open({ baudRate: 9600 });
+            output.textContent += 'Connected to device!\n';
+        }
     } catch (error) {
-        alert('Connection failed: ', error);
+        output.textContent += 'Connection failed: ' + error + '\n';
+        port = null; // Reset port on error
+        return;
     }
 
     // Function to continuously read data from the port
-    while (port.readable) {
+    if (port.readable) {
         const reader = port.readable.getReader();
         try {
             while (true) {
                 const { value, done } = await reader.read();
                 if (done) {
-                    // Allow the serial port to be closed later
                     reader.releaseLock();
                     break;
                 }
-                // Convert the data to text and append to the output area
-                output.textContent += value;
-                output.scrollTop = output.scrollHeight; // Scroll to bottom
+                output.textContent += new TextDecoder().decode(value);
+                output.scrollTop = output.scrollHeight;
             }
         } catch (error) {
-            alert('Error reading data: ', error);
+            output.textContent += 'Error reading data: ' + error + '\n';
         } finally {
             reader.releaseLock();
         }
