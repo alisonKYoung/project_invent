@@ -32,7 +32,12 @@ connectButton.addEventListener('click', async () => {
                     break;
                 }
                 output.textContent += new TextDecoder().decode(value);
-                output.scrollTop = output.scrollHeight;
+               if(output.textContent.includes("\n")) {
+                output.textContent = "";
+                
+               }
+            
+                
             }
         } catch (error) {
             output.textContent += 'Error reading data: ' + error + '\n';
