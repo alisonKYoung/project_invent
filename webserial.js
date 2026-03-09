@@ -47,7 +47,9 @@ async function read_sensor() {
                 reader.releaseLock();
             }
             output.textContent += new TextDecoder().decode(value);
-            output.scrollTop = output.scrollHeight;
+            if(output.textContent.includes("\n")) {
+                output.textContent = "";  
+            }
         } catch (error) {
             output.textContent += 'Error reading data: ' + error + '\n';
         } finally {
