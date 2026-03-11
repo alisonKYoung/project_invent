@@ -68,10 +68,12 @@ async function read_sensor() {
     if (port.readable) {
         try {
             const { value, done } = await reader.read();
+            if (value) {
+                output.textContent = value;
+            }
             if (done) {
                 reader.releaseLock();
             }
-            output.textContent = value;
         } catch (error) {
             output.textContent = 'Error reading data: ' + error + '\n';
         } finally {
