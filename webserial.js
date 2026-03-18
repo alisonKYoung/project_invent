@@ -60,6 +60,8 @@ async function read_sensor() {
                 if (value) {
                     buffer += decoder.decode(value);
 
+                    buffer = buffer.replace(/\r\n/g, '\n');
+
                     let line;
                     while ((line = buffer.split('\n')[0]) && buffer.includes('\n')) {
                         buffer = buffer.slice(line.length + 1);
