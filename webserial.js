@@ -3,28 +3,12 @@ let intervalId = null;
 let isReading = false;
 let currentSensor = "";
 let reader;
+let buffer = "";
 
 const connectButton = document.getElementById('connectButton');
 const output = document.getElementById('kekw');
 const toggleRead = document.getElementById('readButton')
 const mq4Button = document.getElementById('mq4Button');
-
-class LineBreakTransformer {
-  constructor() {
-    this.container = '';
-  }
-
-  transform(chunk, controller) {
-    this.container += chunk;
-    const lines = this.container.split('\n');
-    this.container = lines.pop(); // Keep the last, incomplete line in the container
-    lines.forEach(line => controller.enqueue(line));
-  }
-
-  flush(controller) {
-    controller.enqueue(this.container); // Enqueue any remaining data
-  }
-}
 
 connectButton.addEventListener('click', async () => {
     try {
@@ -38,12 +22,12 @@ connectButton.addEventListener('click', async () => {
             await port.open({ baudRate: 9600 });
             const decoder = new TextDecoderStream();
             const inputDone = port.readable.pipeTo(decoder.writable);
-            const inputStream = decoder.readable.pipeThrough(new TransformStream(new LineBreakTransformer()));
             
             // Get a reader from the transformed stream and start the read loop
-            reader = inputStream.getReader();
+            reader = decoder.getReader();
             output.textContent = "connected!"
         }
+
     } catch (error) {
         port = null; // Reset port on error
         return;
@@ -74,7 +58,13 @@ async function read_sensor() {
                     break;
                 }
                 if (value) {
-                    output.textContent = value;
+                    buffer += decoder.decode(value);
+
+                    let line;
+                    while ((line = buffer.split('\n')[0]) && buffer.includes('\n')) {
+                        buffer = buffer.slice(line.length + 1);
+                        output.textContent = line.trim();
+                    }
                 }
                 
             } catch (error) {
