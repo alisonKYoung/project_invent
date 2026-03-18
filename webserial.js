@@ -52,13 +52,13 @@ connectButton.addEventListener('click', async () => {
 
 async function toggle_read_sensor() {
     if (isReading) {
-        clearInterval(intervalId);
         isReading = false;
+        reader.cancel();
         toggleRead.textContent='start reading data';
         writeToSensor("remove\n");
     } else {
         writeToSensor(currentSensor);
-        intervalId = setInterval(read_sensor, 200);
+        read_sensor()
         isReading = true;
         toggleRead.textContent='stop reading data'
     }
@@ -66,18 +66,22 @@ async function toggle_read_sensor() {
 
 async function read_sensor() {
     if (port.readable) {
-        try {
-            const { value, done } = await reader.read();
-            if (value) {
-                output.textContent = value;
-            }
-            if (done) {
+        while (true) {
+            try {
+                const { value, done } = await reader.read();
+                if (done || !isReading) {
+                    reader.releaseLock();
+                    break;
+                }
+                if (value) {
+                    output.textContent = value;
+                }
+                
+            } catch (error) {
+                output.textContent = 'Error reading data: ' + error + '\n';
+            } finally {
                 reader.releaseLock();
             }
-        } catch (error) {
-            output.textContent = 'Error reading data: ' + error + '\n';
-        } finally {
-            reader.releaseLock();
         }
     }
 }
