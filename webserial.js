@@ -17,6 +17,10 @@ connectButton.addEventListener('click', async () => {
         if (!port) {
             port = await navigator.serial.requestPort();
         }
+
+        if (port.opened) {
+            await port.close();
+        }
         
         // Only open if not already open
         if (!port.opened) {
