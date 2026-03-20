@@ -7,8 +7,9 @@ let buffer = "";
 
 const connectButton = document.getElementById('connectButton');
 const output = document.getElementById('kekw');
-const toggleRead = document.getElementById('readButton')
+const toggleRead = document.getElementById('readButton');
 const mq4Button = document.getElementById('mq4Button');
+const disconnectButton = document.getElementById('disconnectButton');
 
 connectButton.addEventListener('click', async () => {
     try {
@@ -61,6 +62,7 @@ async function read_sensor() {
                     buffer += decoder.decode(value);
 
                     buffer = buffer.replace(/\r\n/g, '\n');
+                    console.log(buffer);
 
                     let line;
                     while ((line = buffer.split('\n')[0]) && buffer.includes('\n')) {
@@ -106,7 +108,19 @@ function setCurrentSensor(sensor) {
     currentSensor = sensor;
 }
 
+async function disconnect() {
+    if (reader) {
+        await reader.cancel();
+        reader = null;
+    }
+
+    await port.close();
+    console.log("port closed");
+    await port.forget();
+}
+
 toggleRead.addEventListener('click', toggle_read_sensor);
 mq4Button.addEventListener('click', () => {
     setCurrentSensor("mq4\n");
 })
+disconnectButton.addEventListener('click', disconnect);
