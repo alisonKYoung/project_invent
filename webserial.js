@@ -29,7 +29,7 @@ connectButton.addEventListener('click', async () => {
             const inputDone = port.readable.pipeTo(decoder.writable);
             
             // Get a reader from the transformed stream and start the read loop
-            reader = decoder.getReader();
+            reader = decoder.readable.getReader();
             output.textContent = "connected!"
         }
 
