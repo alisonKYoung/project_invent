@@ -31,6 +31,7 @@ connectButton.addEventListener('click', async () => {
 
     } catch (error) {
         port = null; // Reset port on error
+        console.log(error);
         return;
     }
 });
