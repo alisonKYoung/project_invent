@@ -4,7 +4,7 @@ let isReading = false;
 let currentSensor = "";
 let reader;
 let buffer = "";
-let decoder;
+let decoder = new TextDecoderStream();
 
 const connectButton = document.getElementById('connectButton');
 const output = document.getElementById('kekw');
@@ -26,7 +26,6 @@ connectButton.addEventListener('click', async () => {
         // Only open if not already open
         if (!port.opened) {
             await port.open({ baudRate: 9600 });
-            decoder = new TextDecoderStream();
             const inputDone = port.readable.pipeTo(decoder.writable);
             
             // Get a reader from the transformed stream and start the read loop
