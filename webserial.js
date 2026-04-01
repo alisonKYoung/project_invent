@@ -4,6 +4,7 @@ let isReading = false;
 let currentSensor = "";
 let reader;
 let buffer = "";
+let decoder;
 
 const connectButton = document.getElementById('connectButton');
 const output = document.getElementById('kekw');
@@ -25,7 +26,7 @@ connectButton.addEventListener('click', async () => {
         // Only open if not already open
         if (!port.opened) {
             await port.open({ baudRate: 9600 });
-            const decoder = new TextDecoderStream();
+            decoder = new TextDecoderStream();
             const inputDone = port.readable.pipeTo(decoder.writable);
             
             // Get a reader from the transformed stream and start the read loop
@@ -78,8 +79,6 @@ async function read_sensor() {
                 
             } catch (error) {
                 output.textContent = 'Error reading data: ' + error + '\n';
-            } finally {
-                reader.releaseLock();
             }
         }
     }
@@ -119,9 +118,15 @@ async function disconnect() {
         reader = null;
     }
 
-    await port.close();
-    console.log("port closed");
-    await port.forget();
+    if (port) {
+        await port.close();
+        console.log("port closed");
+        await port.forget();
+        port = null;
+    }
+
+    decoder = null;
+    output.textContent = "disconnected";
 }
 
 toggleRead.addEventListener('click', toggle_read_sensor);
