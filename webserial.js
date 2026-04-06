@@ -44,7 +44,7 @@ connectButton.addEventListener('click', async () => {
             
             // Get a reader from the transformed stream and start the read loop
             reader = decoder.readable.getReader();
-            output.textContent = "connected!"
+            output.textContent = "Connected!"
         }
 
     } catch (error) {
@@ -89,7 +89,10 @@ async function read_sensor() {
                     while ((line = buffer.split('\n')[0]) && buffer.includes('\n')) {
                         buffer = buffer.slice(line.length + 1);
                         output.textContent = line.trim();
-                        updateGraph(tick, parseFloat(line.trim()));
+                        val = Number.parseFloat(line.trim());
+                        if (!Number.isNaN(val)) {
+                            updateGraph(tick, val);
+                        }
                     }
                 }
                 
@@ -126,6 +129,7 @@ async function writeToSensor(text) {
 
 function setCurrentSensor(sensor) {
     currentSensor = sensor;
+    output.textContent = "Swapped sensor!";
 }
 
 async function disconnect() {
@@ -142,7 +146,7 @@ async function disconnect() {
     }
 
     decoder = null;
-    output.textContent = "disconnected";
+    output.textContent = "Disconnected!";
 }
 
 function updateGraph(x, y) {
