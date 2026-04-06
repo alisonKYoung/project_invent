@@ -9,8 +9,21 @@ let decoder;
 const connectButton = document.getElementById('connectButton');
 const output = document.getElementById('kekw');
 const toggleRead = document.getElementById('readButton');
-const mq4Button = document.getElementById('mq4Button');
+const sensorDropdown = document.getElementById('sensorDropdown');
+const selectButton = document.getElementById('selectButton');
 const disconnectButton = document.getElementById('disconnectButton');
+const resetChartButton = document.getElementById('resetChart');
+const ctx = document.getElementById('gasChart');
+const gasChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'PPM',
+            data: []
+        }]
+    }
+})
 
 connectButton.addEventListener('click', async () => {
     try {
@@ -49,13 +62,16 @@ async function toggle_read_sensor() {
         writeToSensor("remove\n");
     } else {
         writeToSensor(currentSensor);
-        read_sensor()
         isReading = true;
+        read_sensor()
         toggleRead.textContent='stop reading data'
     }
 }
 
 async function read_sensor() {
+    //TODO add plot using x: tick, y: value and generate plot button
+    //Also maybe add reset plot
+    var tick = 0;
     if (port.readable) {
         while (true) {
             try {
@@ -68,12 +84,12 @@ async function read_sensor() {
                     buffer += value;
 
                     buffer = buffer.replace(/\r\n/g, '\n');
-                    console.log(buffer);
 
                     let line;
                     while ((line = buffer.split('\n')[0]) && buffer.includes('\n')) {
                         buffer = buffer.slice(line.length + 1);
                         output.textContent = line.trim();
+                        updateGraph(tick, parseFloat(line.trim()));
                     }
                 }
                 
@@ -129,8 +145,21 @@ async function disconnect() {
     output.textContent = "disconnected";
 }
 
+function updateGraph(x, y) {
+    gasChart.data.labels.push(x);
+    gasChart.data.datasets[0].data.push(y);
+    gasChart.update();
+}
+
+function clearGraph() {
+    gasChart.data.labels = [];
+    gasChart.data.datasets[0].data = [];
+    gasChart.update();
+}
+
 toggleRead.addEventListener('click', toggle_read_sensor);
-mq4Button.addEventListener('click', () => {
-    setCurrentSensor("mq4\n");
+selectButton.addEventListener('click', () => {
+    setCurrentSensor(sensorDropdown.value);
 })
 disconnectButton.addEventListener('click', disconnect);
+resetChartButton.addEventListener('click', clearGraph);
