@@ -163,7 +163,7 @@ function clearGraph() {
 
 toggleRead.addEventListener('click', toggle_read_sensor);
 selectButton.addEventListener('click', () => {
-    setCurrentSensor(sensorDropdown.value);
+    setCurrentSensor(`${sensorDropdown.value}\n`);
 })
 disconnectButton.addEventListener('click', disconnect);
 resetChartButton.addEventListener('click', clearGraph);
