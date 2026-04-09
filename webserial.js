@@ -57,20 +57,22 @@ connectButton.addEventListener('click', async () => {
 async function toggle_read_sensor() {
     if (isReading) {
         isReading = false;
-        reader.cancel();
-        toggleRead.textContent='start reading data';
+        toggleRead.textContent='Start reading data';
         writeToSensor("remove\n");
     } else {
         writeToSensor(currentSensor);
         isReading = true;
+        if (!reader) {
+            decoder = new TextDecoderStream()
+            const inputDone = port.readable.pipeTo(decoder.writable);
+            reader = decoder.readable.getReader();
+        }
         read_sensor()
-        toggleRead.textContent='stop reading data'
+        toggleRead.textContent='Stop reading data'
     }
 }
 
 async function read_sensor() {
-    //TODO add plot using x: tick, y: value and generate plot button
-    //Also maybe add reset plot
     var tick = 0;
     if (port.readable) {
         while (true) {
@@ -93,11 +95,12 @@ async function read_sensor() {
                         if (!Number.isNaN(val)) {
                             updateGraph(tick, val);
                         }
+                        tick++
                     }
                 }
                 
             } catch (error) {
-                output.textContent = 'Error reading data: ' + error + '\n';
+                console.log(error)
             }
         }
     }
