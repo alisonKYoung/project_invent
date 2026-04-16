@@ -4,18 +4,19 @@
     <meta charset="UTF-8">
     <title>Gas Sensor Reading</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <button id="connectButton">Connect to handle</button>
+    <button id="connectButton" class="btn">Connect to handle</button>
     <label for="sensorDropdown">Select a sensor: </label>
     <select id="sensorDropdown">
         <option value="mq3">MQ3</option>
         <option value="mq4">MQ4</option>
     </select>
-    <button id="selectButton">Switch to selected sensor</button>
-    <button id="readButton">Start reading data</button>
-    <button id="disconnectButton">Disconnect</button>
-    <button id="resetChart">Reset graph</button>
+    <button id="selectButton" class="btn">Switch to selected sensor</button>
+    <button id="readButton" class="btn">Start reading data</button>
+    <button id="disconnectButton" class="btn">Disconnect</button>
+    <button id="resetChart" class="btn">Reset graph</button>
     <pre id="kekw">Click "Connect to handle" button first</pre>
     <canvas id="gasChart" style="width:100%;max-width:600px;"></canvas>
     <script src="webserial.js"></script>
