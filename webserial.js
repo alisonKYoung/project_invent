@@ -5,6 +5,7 @@ let currentSensor = "";
 let reader;
 let buffer = "";
 let decoder;
+let tick = 0;
 
 const connectButton = document.getElementById('connectButton');
 const output = document.getElementById('kekw');
@@ -73,7 +74,6 @@ async function toggle_read_sensor() {
 }
 
 async function read_sensor() {
-    var tick = 0;
     if (port.readable) {
         while (true) {
             try {
@@ -155,12 +155,17 @@ async function disconnect() {
 function updateGraph(x, y) {
     gasChart.data.labels.push(x);
     gasChart.data.datasets[0].data.push(y);
+    if (gasChart.data.labels.length > 500) {
+        gasChart.data.labels.shift();
+        gasChart.data.datasets[0].data.shift();
+    }
     gasChart.update();
 }
 
 function clearGraph() {
     gasChart.data.labels = [];
     gasChart.data.datasets[0].data = [];
+    tick = 0;
     gasChart.update();
 }
 
