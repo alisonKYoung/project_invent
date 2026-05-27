@@ -153,12 +153,12 @@ async function disconnect() {
 }
 
 function updateGraph(x, y) {
-    gasChart.data.labels.push(x);
-    gasChart.data.datasets[0].data.push(y);
     if (gasChart.data.labels.length > 200) {
         gasChart.data.labels.shift();
         gasChart.data.datasets[0].data.shift();
     }
+    gasChart.data.labels.push(x);
+    gasChart.data.datasets[0].data.push(y);
     gasChart.update();
 }
 
