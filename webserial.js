@@ -159,7 +159,7 @@ function updateGraph(x, y) {
     }
     gasChart.data.labels.push(x);
     gasChart.data.datasets[0].data.push(y);
-    gasChart.update('none');
+    gasChart.update();
 }
 
 function clearGraph() {
